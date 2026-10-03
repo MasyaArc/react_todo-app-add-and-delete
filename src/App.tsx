@@ -137,7 +137,7 @@ export const App: React.FC = () => {
           setErrorMessage('');
         }, 3000);
       });
-  }, [loadingTodo, isDeletingCompleted]);
+  }, []);
 
   // #endregion get todos
 
@@ -155,13 +155,18 @@ export const App: React.FC = () => {
       isLoading: true,
       id: [...prev.id, id],
     }));
+
     api
       .deleteTodo(id)
+      .then(() => {
+        setTodosFromServer(current => current.filter(cur => cur.id !== id));
+      })
       .catch(() => setErrorMessage(ErrorMessage.Delete))
       .finally(() => {
         window.setTimeout(() => {
           setErrorMessage('');
         }, 3000);
+
         setLoadingTodo(prev => ({
           isLoading: false,
           id: prev.id.filter(idPrev => id !== idPrev),
@@ -174,13 +179,25 @@ export const App: React.FC = () => {
 
     setIsDeletingCompleted(true);
 
-    try {
-      await Promise.all(completeTodos.map(todo => api.deleteTodo(todo.id)));
-    } catch {
+    const results = await Promise.allSettled(
+      completeTodos.map(todo => api.deleteTodo(todo.id)),
+    );
+
+    const failedIds = results
+      .map((result, index) =>
+        result.status === 'rejected' ? completeTodos[index].id : null,
+      )
+      .filter((id): id is number => id !== null);
+
+    setTodosFromServer(current =>
+      current.filter(todo => !todo.completed || failedIds.includes(todo.id)),
+    );
+
+    if (failedIds.length > 0) {
       setErrorMessage(ErrorMessage.Delete);
-    } finally {
-      setIsDeletingCompleted(false);
     }
+
+    setIsDeletingCompleted(false);
   };
   // #endregion delete
   // if (!USER_ID) {

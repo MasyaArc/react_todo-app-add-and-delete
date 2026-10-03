@@ -42,7 +42,7 @@ export const Footer = ({
               className={classNames('filter__link', {
                 selected: filterStatus === options,
               })}
-              data-cy="FilterLinkAll"
+              data-cy={`FilterLink${options}`}
               onClick={() => {
                 setFilterStatus(options);
               }}
@@ -69,7 +69,10 @@ export const Footer = ({
           type="button"
           className="todoapp__clear-completed hidden"
           data-cy="ClearCompletedButton"
-        ></button>
+          disabled
+        >
+          Clear completed
+        </button>
       )}
     </footer>
   );
