@@ -9,7 +9,7 @@ type Props = {
   deleteTodo: (idL: number) => void;
   loadingTodo: {
     isLoading: boolean;
-    id: number;
+    id: number[];
   };
   isDeletingCompleted: boolean;
 };
@@ -119,18 +119,17 @@ export const Main = ({
               ×
             </button>
           )}
-          {todo.id === loadingTodo.id && (
-            <div data-cy="TodoLoader" className="modal overlay is-active">
-              <div className="modal-background has-background-white-ter" />
-              <div className="loader" />
-            </div>
-          )}
-          {isDeletingCompleted && todo.completed && (
-            <div data-cy="TodoLoader" className="modal overlay is-active">
-              <div className="modal-background has-background-white-ter" />
-              <div className="loader" />
-            </div>
-          )}
+          <div
+            data-cy="TodoLoader"
+            className={classNames('modal overlay', {
+              'is-active':
+                loadingTodo.id.includes(todo.id) ||
+                (isDeletingCompleted && todo.completed),
+            })}
+          >
+            <div className="modal-background has-background-white-ter" />
+            <div className="loader" />
+          </div>
         </div>
       ))}
     </section>

@@ -14,14 +14,15 @@ import { ErrorMessage } from './types/ErrorMessage';
 import { FilterOption } from './types/FilterOption';
 import { NewTodo } from './types/newTodo';
 import { TempTodo } from './components/tempTodo/tempTodo';
+import { LoadingState } from './types/loadingState';
 
 export const App: React.FC = () => {
   const [todosFromServer, setTodosFromServer] = useState<Todo[]>([]);
   const [filterStatus, setFilterStatus] = useState(FilterOption.All);
   const [errorMessage, setErrorMessage] = useState('');
-  const [loadingTodo, setLoadingTodo] = useState({
+  const [loadingTodo, setLoadingTodo] = useState<LoadingState>({
     isLoading: false,
-    id: 0,
+    id: [],
   });
   const refFocusInputSearch = useRef<HTMLInputElement>(null);
   const [isDeletingCompleted, setIsDeletingCompleted] = useState(false);
@@ -150,10 +151,10 @@ export const App: React.FC = () => {
 
   // #region delete
   const deleteTodo = (id: number) => {
-    setLoadingTodo({
+    setLoadingTodo(prev => ({
       isLoading: true,
-      id: id,
-    });
+      id: [...prev.id, id],
+    }));
     api
       .deleteTodo(id)
       .catch(() => setErrorMessage(ErrorMessage.Delete))
@@ -161,10 +162,10 @@ export const App: React.FC = () => {
         window.setTimeout(() => {
           setErrorMessage('');
         }, 3000);
-        setLoadingTodo({
+        setLoadingTodo(prev => ({
           isLoading: false,
-          id: 0,
-        });
+          id: prev.id.filter(idPrev => id !== idPrev),
+        }));
       });
   };
 
