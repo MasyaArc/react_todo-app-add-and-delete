@@ -20,6 +20,7 @@ export const App: React.FC = () => {
   const [todosFromServer, setTodosFromServer] = useState<Todo[]>([]);
   const [filterStatus, setFilterStatus] = useState(FilterOption.All);
   const [errorMessage, setErrorMessage] = useState('');
+
   const [loadingTodo, setLoadingTodo] = useState<LoadingState>({
     isLoading: false,
     id: [],
